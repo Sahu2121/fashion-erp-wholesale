@@ -1,0 +1,27 @@
+import sqlite3, importlib.util
+p='/mnt/data/work1651_1850/work1451_1650/app.py'
+s=importlib.util.spec_from_file_location('erp',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m)
+c=sqlite3.connect(':memory:')
+c.execute('CREATE TABLE accounts(id INTEGER PRIMARY KEY, account_name TEXT, balance REAL)')
+c.execute('CREATE TABLE sales_invoices(id INTEGER PRIMARY KEY, invoice_no TEXT, account_id INTEGER, total REAL, status TEXT, created_at TEXT, updated_at TEXT, FOREIGN KEY(account_id) REFERENCES accounts(id))')
+c.execute('CREATE TABLE purchase_bills(id INTEGER PRIMARY KEY, bill_no TEXT, total REAL, status TEXT)')
+c.execute('CREATE TABLE godown_stock(id INTEGER PRIMARY KEY, sku TEXT, qty REAL)')
+c.execute('CREATE TABLE journal_entries(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE journal_lines(id INTEGER PRIMARY KEY, journal_id INTEGER, debit REAL, credit REAL)')
+c.execute('CREATE TABLE gst_period_closures(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE stock_transfers(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE sales_orders(id INTEGER PRIMARY KEY, order_no TEXT, status TEXT)')
+c.execute('CREATE TABLE role_permissions(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE audit_log(id INTEGER PRIMARY KEY, actor TEXT)')
+c.execute('CREATE TABLE payment_register(id INTEGER PRIMARY KEY, amount REAL)')
+c.execute('CREATE TABLE audit_trail(id INTEGER PRIMARY KEY, actor TEXT)')
+c.execute('CREATE TABLE collection_followups(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE schema_version(id INTEGER PRIMARY KEY, version TEXT)')
+c.execute('CREATE TABLE period_locks(id INTEGER PRIMARY KEY, status TEXT)')
+c.execute('CREATE TABLE stock_movements(id INTEGER PRIMARY KEY, qty REAL)')
+c.execute('CREATE TABLE hsn_master(id INTEGER PRIMARY KEY, hsn_code TEXT)')
+r=m.phases_1651_1850_smoke(c)
+assert r['ok'] and r['count']==200, r
+snap=m.enterprise_release_snapshot_1850(c)
+assert snap['status']=='READY' and snap['phase_count']==200 and snap['log_count']==400
+print('PHASE_1651_1850_TEST_PASS', r['count'], snap['log_count'])
